@@ -1,9 +1,9 @@
 import React from 'react';
-function StatuSquare(props){
+function StatutSquare(props){
 
-    const [statut,setStatut] = React.useState(props.statut)
+    //const [statut,setStatut] = React.useState(props.statut)
 
-    function changeStatut(){
+    /*function changeStatut(){
         if(statut === "OK"){
             setStatut ("warning")
         } else if (statut ==="warning"){
@@ -11,9 +11,11 @@ function StatuSquare(props){
         } else if (statut === "alert") {
             setStatut ("OK")
         }
-    }
+    }*/
 
-    return    <div onClick={changeStatut} className = {statut}></div>;
+    return    <div onClick={ () => {
+        props.onClickStatut(props.statut);
+    } } className = {props.statut}></div>;
 }
 
-export default StatuSquare ;
+export default StatutSquare ;

@@ -1,65 +1,49 @@
-import React, {useState} from 'react';
+import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 //Import du même dossier
 import Heading from "./Heading";
-import Note from "./Note";
+import Notes from "./Notes";
 import Footer from "./Footer";
-import CreateArea from './CreateArea';
+import Login from "./Login";
+import Logout from "./Logout";
+import Home from "./Home";
+import NotFound from "./NotFound";
+import RequireAuth from './RequireAuth';
 
-//import d'un dossier supérieur
-import notesInfo from "../NotesInfo";
+//Service
+import AuthentificationService from './AuthentificationService.js';
 
 //JS map pour boucler sur l'array notesInfos
 
 function App(){
 
-    //State la liste des notes
-    const [listNotes,setListNotes] = useState(notesInfo);
+  const [isUserLoggedIn,setLogged] = React.useState(AuthentificationService.isUserLoggedIn())
 
-    //Suprimer la note
-    function deleteNotes(id){
-        console.log("please delete the note with id : " + id );
-        setListNotes( prevNotes => {
-            return prevNotes.filter((item,index) => {
-                return index !==id;
-            })
-        })
-    }
-
-        //Ajouter une note
-        function addNote(newNoteInfo){
-            console.log("New note asked ");
-            const newNote = {
-                title : newNoteInfo.title,
-                content: newNoteInfo.content, 
-                statut: "OK" 
-            }
-            setListNotes( prevNotes => {
-                return [...prevNotes, newNote]
-            })
-        }
-
+  const majLog = () => {
+      setLogged(AuthentificationService.isUserLoggedIn())
+  }
 
     return (
         <div>
-    <Heading/>
-    <CreateArea 
-        onClickAdd = {addNote}
+    <BrowserRouter>
+    <Heading  
+        isUserLoggedIn = {isUserLoggedIn}
+        majLog = {majLog}
     />
-    
-    {
-        //L'index est recu de la fonction map
-        listNotes.map( (noteInfo,index) =>  <Note
-        key = {index} //Key est obligatoire avec Map
-        id = {index}
-        title= {noteInfo.title}
-        content= {noteInfo.content}
-        statut= {noteInfo.statut}
-        onClickDelete = {deleteNotes}
-    />
-    )}
-    {console.log("LIST SIZE " + listNotes.length)}
+        <Routes>
+            <Route path= "/login" element ={<Login majLog = {majLog} />} />
+            <Route element= { <RequireAuth />}>
+              <Route path= "/" element ={<Home/>} />
+              <Route path= "/logout" element ={<Logout/>} />
+              <Route path= "/notes/:name" element ={<Notes/>} />
+              <Route path= "/notes" element ={<Notes/>} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    </BrowserRouter>
     <Footer/>
+
     </div>
     );
 }
