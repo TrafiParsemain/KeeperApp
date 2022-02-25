@@ -5,13 +5,15 @@ import { useParams } from 'react-router-dom'; // Pour récupérer les params de 
 import Note from "./Note";
 import CreateArea from './CreateArea';
 
+
 //import d'un dossier supérieur
 import notesInfo from "../NotesInfo";
 
 import  HelloWorldService from "../api/HelloWorldService.js"
 import NotesDataService from '../api/NotesDataService.js';
 import AuthentificationService from './AuthentificationService';
-import { ErrorRounded } from '@mui/icons-material';
+import { ErrorRounded, InfoTwoTone } from '@mui/icons-material';
+import { waitFor } from '@testing-library/react';
 
 //JS map pour boucler sur l'array notesInfos
 
@@ -24,7 +26,15 @@ function Notes(){
 
     const[appMessage,setAppMessage] = useState('');
 
+    const [triggerValue,setTriggerValue] = useState(0);
+
     const {name} = useParams(); // La variable doit être du même que le paramètre et entre {} 
+
+    const [compteurStatut,setCompteurStatut] =  useState({
+        ctOK: 0,
+        ctAlert:0,
+        ctWarning: 0
+    })
 
     //Suprimer la note
     function deleteNotes(id){
@@ -63,25 +73,30 @@ function Notes(){
 
 
         NotesDataService.createNote(username,newNote)
-        .then(response =>  
-            refreshNotes()     
-        )
+        .then(response =>  {
+            refreshNotes()
+        })
 
     }
-
+    //Met a jour la note
     function updateNote(note){
         console.log("Asking to update note for new statut : " + note.statut);
 
         let username = AuthentificationService.getLoggedUsername()
         note.username = username
         NotesDataService.updateNote(username,note.id,note)
-        .then(response =>  refreshNotes())
+        .then(response =>  {
+            refreshNotes()
+        })
     }
 
+    //Met a jour le message
     function updateMessage(newMessage){
         setMessage(newMessage);
     }
 
+
+    //API pour recevoir le message
     function retrieveMessage(){
         //HelloWorldService.executeHelloWorldService()
         //.then( response => updateMessage(response.data))
@@ -100,6 +115,9 @@ function Notes(){
             }
             updateMessage(errorMessage)
         })
+
+        refreshNotes()
+
     }
 
     //Lancé apres le render du composant (Pour les composants type fonction)
@@ -107,13 +125,48 @@ function Notes(){
         refreshNotes();
     },[]);
 
-    function refreshNotes(){
-        console.log("Refresh all notes?");
+    //Met à jout toutes les notes
+    async function refreshNotes(){
+        console.log("Refresh Notes");
         let username = AuthentificationService.getLoggedUsername()
         NotesDataService.RetrieveAllNotes(username)
-        .then(response => setListNotes(response.data))
+        .then(response => {
+            const newListe = response.data
+            setListNotes(newListe)
+            refreshCompteur(newListe)           
+        })
     }
 
+
+    //Mise à jour du compteur de statut
+    function refreshCompteur(newListe){
+        console.log("Refresh Compteur");
+        let compteur = {
+            ctOK: 0,
+            ctAlert: 0,
+            ctWarning: 0
+        }
+        newListe.map( (noteInfo,index) =>{
+            console.log(noteInfo)
+            if(noteInfo.statut === "OK"){
+                compteur.ctOK ++
+                console.log("ok")
+            }else if(noteInfo.statut === "warning"){
+                compteur.ctWarning ++
+                console.log("warning")
+            }else if(noteInfo.statut === "alert"){
+                compteur.ctAlert ++
+                console.log("alert")
+            }
+        })
+        setCompteurStatut(compteur)
+        console.log("NB OK : " + compteurStatut.ctOK)
+        console.log("NB alert : " + compteurStatut.ctAlert)
+        console.log("NB Warning : " + compteurStatut.ctWarning)
+    }
+
+
+    ////////////////////RETOUR /////////////////////
     return (
         <div>
         <div class="alert alert-success">{appMessage}</div>
@@ -126,7 +179,10 @@ function Notes(){
             </div>
         }
 
-    <CreateArea  onClickAdd = {addNote}/>
+    <CreateArea  
+        onClickAdd = {addNote}
+        compteur = {compteurStatut}
+    />
 
     {
         //L'index est recu de la fonction map
@@ -140,7 +196,6 @@ function Notes(){
         updateNote = {updateNote}
     />
     )}
-
 
     {console.log("LIST SIZE " + listNotes.length)}
     </div>

@@ -2,7 +2,9 @@ import React, {useState} from "react";
 import AddIcon from '@mui/icons-material/Add'; //bliblio de icon
 import Fab from '@mui/material/Fab';
 import Zoom from '@mui/material/Zoom';
-
+import ChartJsComponent from "./ChartJsComponent";
+import MyChartExample from "./MyChartExample";
+import MyBarChart from "./MyBarChart";
 
 function CreateArea(props) {
 
@@ -38,11 +40,9 @@ function CreateArea(props) {
   function expand(){
     setExpanded(true);
   }
-
-
-
+  
   return (
-    <div>
+    <div style={{display: 'flex' , alignItems: 'center' , justifyContent: 'center'}}>
       <form onSubmit = {handleClick} className="create-note">
 
         {isExpanded && (
@@ -67,6 +67,12 @@ function CreateArea(props) {
         </Fab>
         </Zoom>
       </form>
+        
+      <div  className="chart">
+      <MyBarChart
+        compteur = {props.compteur}
+      />
+      </div>
     </div>
   );
 }
