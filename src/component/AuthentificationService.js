@@ -8,6 +8,10 @@ class AuthentificationService {
         return "Basic " + window.btoa(username + ":" + password) 
     }
 
+    createJWTToken(token){
+        return "Bearer " + token
+    }
+
     //Test avec l'api l'authentification du user password
     exectuteBasicAutheticatrionService(username,password){
         return axios.get('http://localhost:8080/basicauth',
@@ -18,11 +22,26 @@ class AuthentificationService {
         })
     }
 
+
+    //JWT Authenticate (Response token)
+    exectuteJWTAutheticatrionService(username,password){
+        return axios.post('http://localhost:8080/authenticate',
+        {
+            username,
+            password
+        })
+    }
     
     registerSucessfullLogin(username,password){
         console.log('User logged in sucessfull');
         sessionStorage.setItem('authenticatedUser', username);
         this.setupAxiosIntereceptors(this.createBasicAuthToken(username,password))
+    }
+
+    registerSucessfullLoginForJWT(username,token){
+        console.log('User logged in sucessfull with token');
+        sessionStorage.setItem('authenticatedUser', username);
+        this.setupAxiosIntereceptors(this.createJWTToken(token))
     }
 
     logout(){
@@ -43,7 +62,9 @@ class AuthentificationService {
 
 
     //Configuration de axios intercepteur
-    setupAxiosIntereceptors(basicAuthHeader){
+    //BasicauthHeader pour que le basic (param)
+    //token pour le token
+    setupAxiosIntereceptors(token){
 
         //const username = 'me'
         //const password = 'admin'
@@ -54,7 +75,7 @@ class AuthentificationService {
         axios.interceptors.request.use(
             (config)=> {
                 if(this.isUserLoggedIn){
-                    config.headers.authorization = basicAuthHeader 
+                    config.headers.authorization = token
                 }
                 return config
             }

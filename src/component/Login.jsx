@@ -30,35 +30,41 @@ function Login(props){
       event.preventDefault(); //Important
       //Empeche le reloading classic du submit
 
-      /*if((loginInfo.username === 'me' && loginInfo.password === 'admin') ||
-       (loginInfo.username === 'Trafi' && loginInfo.password === 'admin'))  {
+      ////Basic Auth
+      // AuthentificationService
+      // .exectuteBasicAutheticatrionService(loginInfo.username,loginInfo.password)
+      // .then(
+      //    () => {
+      //     AuthentificationService.registerSucessfullLogin(loginInfo.username,loginInfo.password);
+      //     props.majLog();
+      //     navigate (`/notes/${loginInfo.username}`); // On s'arrete ici car c'est un redirect
+      //     //Utiliser les apostrophe italique (touche 7) pour résoudre une variable
+      //     setLoginInfo((prevValue) => {
+      //       return {
+      //       ...prevValue,
+      //       loginfailed : false,
+      //       loginsuccess : true
+      //       }
+      //     });
+      //    }
+      // ).catch(
+      //   () => {
+      //     setLoginInfo((prevValue) => {
+      //       return {
+      //       ...prevValue,
+      //       loginfailed : true,
+      //       loginsuccess : false
+      //       }
+      //       });
+      //   }
+      // )
 
-        AuthentificationService.registerSucessfullLogin(loginInfo.username,loginInfo.password);
-        props.majLog();
-        navigate (`/notes/${loginInfo.username}`); // On s'arrete ici car c'est un redirect
-        //Utiliser les apostrophe italique (touche 7) pour résoudre une variable
-        setLoginInfo((prevValue) => {
-        return {
-        ...prevValue,
-        loginfailed : false,
-        loginsuccess : true
-        }
-        });
-      } else {
-        setLoginInfo((prevValue) => {
-        return {
-        ...prevValue,
-        loginfailed : true,
-        loginsuccess : false
-        }
-        });
-      }*/
-
+      //JWT Authenticate
       AuthentificationService
-      .exectuteBasicAutheticatrionService(loginInfo.username,loginInfo.password)
+      .exectuteJWTAutheticatrionService(loginInfo.username,loginInfo.password)
       .then(
-         () => {
-          AuthentificationService.registerSucessfullLogin(loginInfo.username,loginInfo.password);
+         (response) => {
+          AuthentificationService.registerSucessfullLoginForJWT(loginInfo.username,response.data.token);
           props.majLog();
           navigate (`/notes/${loginInfo.username}`); // On s'arrete ici car c'est un redirect
           //Utiliser les apostrophe italique (touche 7) pour résoudre une variable
@@ -81,6 +87,7 @@ function Login(props){
             });
         }
       )
+
     }
 
     return <div>

@@ -68,11 +68,6 @@ function CreateArea(props) {
         </Zoom>
       </form>
         
-      <div  className="chart">
-      <MyBarChart
-        compteur = {props.compteur}
-      />
-      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'; // Pour récupérer les params de 
 //Import du même dossier
 import Note from "./Note";
 import CreateArea from './CreateArea';
+import MyBarChart from "./MyBarChart";
 
 
 //import d'un dossier supérieur
@@ -12,8 +13,11 @@ import notesInfo from "../NotesInfo";
 import  HelloWorldService from "../api/HelloWorldService.js"
 import NotesDataService from '../api/NotesDataService.js';
 import AuthentificationService from './AuthentificationService';
-import { ErrorRounded, InfoTwoTone } from '@mui/icons-material';
-import { waitFor } from '@testing-library/react';
+import { ConstructionOutlined, Download, ErrorRounded, InfoTwoTone } from '@mui/icons-material';
+
+import { CSVLink, CSVDownload } from "react-csv" ;
+import Papa from "papaparse";
+import { Alert } from '@mui/material';
 
 //JS map pour boucler sur l'array notesInfos
 
@@ -26,8 +30,6 @@ function Notes(){
 
     const[appMessage,setAppMessage] = useState('');
 
-    const [triggerValue,setTriggerValue] = useState(0);
-
     const {name} = useParams(); // La variable doit être du même que le paramètre et entre {} 
 
     const [compteurStatut,setCompteurStatut] =  useState({
@@ -35,6 +37,9 @@ function Notes(){
         ctAlert:0,
         ctWarning: 0
     })
+
+    const [selectedStatut,setSelectedStatut] = useState("All");
+
 
     //Suprimer la note
     function deleteNotes(id){
@@ -51,7 +56,11 @@ function Notes(){
         NotesDataService.deleteNote(username,id)
         .then(response =>  {  
                 setAppMessage('Sucess of deleting not with id : ' + id)
-                refreshNotes()
+                refreshNotes(selectedStatut)
+            })
+            .catch(error => {
+                setAppMessage(error.message)
+                refreshNotes(selectedStatut)
             })
     }
 
@@ -74,7 +83,7 @@ function Notes(){
 
         NotesDataService.createNote(username,newNote)
         .then(response =>  {
-            refreshNotes()
+            refreshNotes(selectedStatut)
         })
 
     }
@@ -86,7 +95,7 @@ function Notes(){
         note.username = username
         NotesDataService.updateNote(username,note.id,note)
         .then(response =>  {
-            refreshNotes()
+            refreshNotes(selectedStatut)
         })
     }
 
@@ -116,20 +125,21 @@ function Notes(){
             updateMessage(errorMessage)
         })
 
-        refreshNotes()
+        refreshNotes(selectedStatut)
 
     }
 
     //Lancé apres le render du composant (Pour les composants type fonction)
     React.useEffect(() =>  {
-        refreshNotes();
+        refreshNotes(selectedStatut);
     },[]);
 
+
     //Met à jout toutes les notes
-    async function refreshNotes(){
+    async function refreshNotes(statut){
         console.log("Refresh Notes");
         let username = AuthentificationService.getLoggedUsername()
-        NotesDataService.RetrieveAllNotes(username)
+        NotesDataService.RetrieveAllNotes(username,statut)
         .then(response => {
             const newListe = response.data
             setListNotes(newListe)
@@ -147,23 +157,47 @@ function Notes(){
             ctWarning: 0
         }
         newListe.map( (noteInfo,index) =>{
-            console.log(noteInfo)
             if(noteInfo.statut === "OK"){
                 compteur.ctOK ++
-                console.log("ok")
             }else if(noteInfo.statut === "warning"){
                 compteur.ctWarning ++
-                console.log("warning")
             }else if(noteInfo.statut === "alert"){
                 compteur.ctAlert ++
-                console.log("alert")
             }
         })
         setCompteurStatut(compteur)
-        console.log("NB OK : " + compteurStatut.ctOK)
-        console.log("NB alert : " + compteurStatut.ctAlert)
-        console.log("NB Warning : " + compteurStatut.ctWarning)
     }
+
+
+    
+    //API pour Dowload
+    function DownloadNotes(){
+
+        console.log("Click on DL button detected")
+
+        let username = AuthentificationService.getLoggedUsername()
+        updateMessage("Téléchargement désactivé")
+        /*NotesDataService.DownloadNotes(username)
+        //.then( response => console.log(response.data))
+        .then(response => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'NotesData.csv'); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+        })
+        .catch(error => {
+            console.log(error.message)
+        })*/
+        
+    }
+
+        function handleSelectChange(e){
+            setSelectedStatut(e.target.value)
+            refreshNotes(e.target.value)
+        
+        }
 
 
     ////////////////////RETOUR /////////////////////
@@ -178,11 +212,29 @@ function Notes(){
             {message}
             </div>
         }
+    <div><button onClick= {DownloadNotes} >DL Notes in CSV</button></div>
+    
+    <div class="wrapper">
+        <div class= "one">           
+            <CreateArea  
+                onClickAdd = {addNote}
+                compteur = {compteurStatut}
+            />
+        </div>
+        <div class = "two cube">
+            <select name ="statut" id ="statut-select" onChange={(e) => handleSelectChange(e)}>
+                <option value="All">Tous</option>
+                <option value="OK">OK</option>
+                <option value="alert">Alert</option>
+                <option value="warning">Warning</option>
+            </select>     
 
-    <CreateArea  
-        onClickAdd = {addNote}
-        compteur = {compteurStatut}
-    />
+
+            <MyBarChart
+            compteur = {compteurStatut}
+         />
+         </div>
+    </div>
 
     {
         //L'index est recu de la fonction map
@@ -196,8 +248,6 @@ function Notes(){
         updateNote = {updateNote}
     />
     )}
-
-    {console.log("LIST SIZE " + listNotes.length)}
     </div>
     );
 }

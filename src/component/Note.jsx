@@ -1,6 +1,8 @@
 import React from 'react';
 import StatutSquare from './StatutSquare';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 
 function Note(props){
@@ -27,6 +29,10 @@ function Note(props){
         props.updateNote(toUpdateNote);
     }
 
+    function handleClick() {
+        console.log("Je suis cliqué id: " + props.id)
+    }
+
 
     return <div className ="note">
     <div>
@@ -41,6 +47,11 @@ function Note(props){
     </table> 
     </div>
     <p>{props.content}</p>
+
+    <button onClick = { handleClick }>
+    <EditIcon/>
+    </button>
+    
     <button onClick = { () => {
         props.onClickDelete(props.id);
     } }>
