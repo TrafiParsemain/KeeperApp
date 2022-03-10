@@ -30,7 +30,13 @@ function Note(props){
     }
 
     function handleClick() {
-        console.log("Je suis cliqué id: " + props.id)
+        const EditedNote = {
+            id: props.id,
+            title: props.title,
+            content: props.content,
+            statut: props.statut
+        }
+        props.editNote(EditedNote)
     }
 
 

@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom'; // Pour récupérer les params de 
 import Note from "./Note";
 import CreateArea from './CreateArea';
 import MyBarChart from "./MyBarChart";
-
+import Modal from './Modal';
 
 //import d'un dossier supérieur
 import notesInfo from "../NotesInfo";
@@ -40,8 +40,21 @@ function Notes(){
 
     const [selectedStatut,setSelectedStatut] = useState("All");
 
+    const [modalVisible, setModalVisible] = useState(false)
 
-    //Suprimer la note
+    const [noteModal,setNoteModal] = useState()
+
+    function handleModalChange(event){
+        const {name,value} = event.target
+        setNoteModal((prevValue) => {
+          return {
+          ...prevValue,
+          [name]: value
+        }
+        });
+      }
+
+    //Supprimer la note
     function deleteNotes(id){
         console.log("please delete the note with id : " + id );
         
@@ -87,6 +100,14 @@ function Notes(){
         })
 
     }
+
+
+    //EDIT NOTE
+    function editNote(note){
+        setNoteModal(note)
+        showModal()
+    }
+
     //Met a jour la note
     function updateNote(note){
         console.log("Asking to update note for new statut : " + note.statut);
@@ -195,8 +216,19 @@ function Notes(){
 
         function handleSelectChange(e){
             setSelectedStatut(e.target.value)
-            refreshNotes(e.target.value)
-        
+            refreshNotes(e.target.value)  
+        }
+
+        function showModal(){setModalVisible(!modalVisible)}
+
+        function hideModal(){setModalVisible(false)}
+
+        function submitEditNote() {
+            
+            setModalVisible(false)
+            console.log(noteModal)
+            updateNote(noteModal)
+            
         }
 
 
@@ -230,11 +262,21 @@ function Notes(){
             </select>     
 
 
-            <MyBarChart
+        <MyBarChart
             compteur = {compteurStatut}
          />
          </div>
     </div>
+    
+
+    <Modal 
+    onClose={showModal}
+    show = {modalVisible}
+    clicOutside= {hideModal}
+    children = {noteModal}
+    changeTextFunction= {handleModalChange}
+    submitEditNote = {submitEditNote}
+    />
 
     {
         //L'index est recu de la fonction map
@@ -246,6 +288,7 @@ function Notes(){
         statut= {noteInfo.statut}
         onClickDelete = {deleteNotes}
         updateNote = {updateNote}
+        editNote = {editNote}
     />
     )}
     </div>
