@@ -10,6 +10,8 @@ import Logout from "./Logout";
 import Home from "./Home";
 import NotFound from "./NotFound";
 import RequireAuth from './RequireAuth';
+import Register from './Register';
+import Pdf from './Pdf';
 
 //Service
 import AuthentificationService from './AuthentificationService.js';
@@ -33,11 +35,13 @@ function App(){
     />
         <Routes>
             <Route path= "/login" element ={<Login majLog = {majLog} />} />
+            <Route path= "/register" element ={<Register majLog = {majLog} />} />
             <Route element= { <RequireAuth />}>
               <Route path= "/" element ={<Home/>} />
               <Route path= "/logout" element ={<Logout/>} />
               <Route path= "/notes/:name" element ={<Notes/>} />
               <Route path= "/notes" element ={<Notes/>} />
+              <Route path= "/pdf" element ={<Pdf/>} />
             </Route>
             <Route path="*" element={<NotFound />} />
         </Routes>

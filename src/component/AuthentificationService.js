@@ -41,6 +41,7 @@ class AuthentificationService {
     registerSucessfullLoginForJWT(username,token){
         console.log('User logged in sucessfull with token');
         sessionStorage.setItem('authenticatedUser', username);
+        //localStorage.setItem('token',token)
         this.setupAxiosIntereceptors(this.createJWTToken(token))
     }
 
@@ -56,6 +57,7 @@ class AuthentificationService {
 
     getLoggedUsername(){
         let user = sessionStorage.getItem('authenticatedUser');
+        //let user = localStorage.getItem('authenticatedUser');
         if (user === null)  return '';
         return user ;
     }

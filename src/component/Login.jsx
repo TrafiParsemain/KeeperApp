@@ -90,16 +90,24 @@ function Login(props){
 
     }
 
-    return <div>
-    <form onSubmit = {handleClick}>
-    <input type= "text" placeholder= "Username" name ="username" required onChange={handleChange}  value = {loginInfo.username} ></input>
-    <input type= "password" placeholder= "Password" name ="password" required onChange={handleChange}  value = {loginInfo.password}></input>
-    <button type = "submit">login</button>
-    </form>
+    return (
+    <div className = "view--login">
+      <form onSubmit = {handleClick} className = "form-container">
+        <input type= "text" placeholder= "Username" name ="username" required onChange={handleChange}  value = {loginInfo.username} ></input>
+        <input type= "password" placeholder= "Password" name ="password" required onChange={handleChange}  value = {loginInfo.password}></input>
+        <button type = "submit">login</button>
+      </form>
 
-    {loginInfo.loginfailed && 'Invalid Login'}
-    {loginInfo.loginsuccess && 'Logged OK'}
+      {
+        loginInfo.loginfailed && 
+        <div className="errors">Invalid Login</div>
+      }
+      {
+        loginInfo.loginsuccess &&
+         <div className="success">Logged OK</div>
+        }
     </div>
+    )
 }
 
 export default Login ;

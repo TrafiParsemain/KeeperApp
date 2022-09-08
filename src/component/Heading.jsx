@@ -16,7 +16,9 @@ function Heading(props){
             <ul>
               {props.isUserLoggedIn && <li><Link to="/">Home</Link></li>}
               {props.isUserLoggedIn && <li><Link to="/notes">Notes</Link></li>}
+              {props.isUserLoggedIn && <li><Link to="/pdf">PDF</Link></li>}
               {!props.isUserLoggedIn && <li><Link to="/login">Login</Link></li>}
+              {!props.isUserLoggedIn && <li><Link to="/register">Register</Link></li>}
               {props.isUserLoggedIn && <li><Link to="/logout" onClick={handleLogOut}>Logout</Link></li>}
             </ul>
           </nav>
